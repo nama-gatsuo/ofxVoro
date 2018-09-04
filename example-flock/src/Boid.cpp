@@ -254,26 +254,32 @@ void Boid::draw() {
 
 //-------------------------------------------------------- Asking
 bool Boid::isOver(int x, int y){
-	GLdouble _x = 0;
+	/*GLdouble _x = 0;
 	GLdouble _y = 0;
-	GLdouble _z = 0;
+	GLdouble _z = 0;*/
 	
-	//glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
+	glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
 	
-	GLint viewport[4];
-	GLdouble mvmatrix[16], projmatrix[16];
+	//GLint viewport[4];
+	//GLdouble mvmatrix[16], projmatrix[16];
 	
-	glGetIntegerv(GL_VIEWPORT, viewport);
-	glGetDoublev(GL_MODELVIEW_MATRIX, mvmatrix);
-	glGetDoublev(GL_PROJECTION_MATRIX, projmatrix);
+	glm::mat4 modelView, proj;
+
+	//glGetIntegerv(GL_VIEWPORT, viewport);
+	//glGetDoublev(GL_MODELVIEW_MATRIX, mvmatrix);
+	//glGetDoublev(GL_PROJECTION_MATRIX, projmatrix);
 	
-	gluProject(x, y, z,
-			   mvmatrix, projmatrix, viewport,
-			   &_x, &_y, &_z);
+	ofSetMatrixMode(OF_MATRIX_MODELVIEW);
+	ofLoadMatrix(modelView);
+
+	ofSetMatrixMode(OF_MATRIX_PROJECTION);
+	ofLoadMatrix(proj);
+
+	glm::vec4 np = proj * modelView * glm::vec4(x, y, z, 1.);
 	
-	_y = ofGetHeight() - _y;
+	np.y = ofGetHeight() - np.y;
 	
-	if ( ofDist(x,y,_x,_y) <= sc * ofMap(z,0,-5000,9,1) ) selected = true;
+	if ( ofDist(x, y, np.x, np.y) <= sc * ofMap(z,0,-5000,9,1) ) selected = true;
 	else selected = false;
 	
 	return selected; 
